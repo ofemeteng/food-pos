@@ -125,10 +125,13 @@ Core analytics:
 - `users` and `roles`
 - `products`, `product_variants`, `recipes_bom`
 - `sales_orders`, `sales_order_items`, `payments`
+- `daily_shift_closures`, `cash_reconciliation_checks`, `owner_signoffs`
 - `production_batches`, `production_outputs`, `waste_logs`
 - `inventory_items`, `inventory_movements`, `stock_counts`
 - `suppliers`, `purchase_orders`, `grn_receipts`
 - `expense_entries`, `cashbook_entries`
+- `weekly_business_reviews`, `weekly_issues`, `weekly_actions`
+- `monthly_pnl_snapshots`, `monthly_survival_status`, `loan_schedules`
 - `targets`, `kpi_definitions`, `kpi_snapshots`
 - `ledger_entries` (for P&L and audit trail)
 
@@ -168,6 +171,13 @@ Design principle:
 - Late supplier delivery rate
 - Production adherence % (planned vs actual)
 
+### Daily/Weekly/Monthly health status KPIs
+- **Daily Cash Status** (OK / Warning / Critical)
+- **Weekly Cost Status** (within threshold vs above threshold)
+- **Monthly Survival Status** (below floor / survival floor / target)
+- Cash check variance and unresolved count
+- Owner sign-off compliance rate
+
 ---
 
 ## 6) Decision Rules (Action thresholds)
@@ -176,6 +186,7 @@ Design principle:
 - If waste > 4% of production value weekly -> reduce batch sizes and tighten forecast.
 - If energy cost > 8% of revenue monthly -> audit generator runtime and oven scheduling.
 - If stock variance > 2% in any category -> immediate count investigation and access control review.
+- If owner sign-off misses 2 days in one week -> require branch manager escalation.
 
 ---
 
@@ -188,7 +199,58 @@ Design principle:
 
 ---
 
-## 8) Implementation Roadmap (Practical)
+## 8) Spreadsheet-to-Software Transition (your current process)
+
+To make your existing manual tracking immediately useful in the software rollout, capture the same structures below as digital forms and snapshots:
+
+### Daily Sales & Cash Sheet
+Fields to preserve:
+- Date
+- Opening cash
+- Cash sales
+- Transfer sales
+- POS sales
+- Total sales
+- Expenses
+- Closing cash
+- Cash check (difference)
+- Status
+- Owner sign-off (Yes/No)
+
+### Weekly Review Sheet
+Fields to preserve:
+- Week
+- Total sales / avg daily sales / best day / worst day
+- Ingredients, staff, power, marketing cost
+- Ingredient %, staff %, power %
+- Weekly status
+- Opening cash / closing cash
+- Revenue share due / paid
+- Issues identified
+- Actions taken
+
+### Monthly Survival Sheet
+Fields to preserve:
+- Month
+- Total revenue
+- COGS
+- Gross profit
+- Operating expenses
+- Net operating cash
+- Rent / staff / power
+- Fixed coverage status
+- Cash balance
+- Loan outstanding
+- Runway (months)
+- Key decisions
+
+Recommendation:
+- Keep these layouts as ingestion templates for the first 30-60 days.
+- Run dual mode (manual + system) until variance is <2%.
+
+---
+
+## 9) Implementation Roadmap (Practical)
 
 ### Phase 1 (Weeks 1-4): Foundation
 - POS transaction capture
@@ -196,12 +258,14 @@ Design principle:
 - Basic inventory in/out
 - Daily flash dashboard
 - Role-based access control
+- Digital daily cash closure form (mirrors current sheet)
 
 ### Phase 2 (Weeks 5-8): Cost & Inventory Discipline
 - Recipe/BOM and COGS calculator
 - Purchase + GRN workflow
 - Stock count + variance audit
 - Expense capture and approvals
+- Weekly cost-status report auto-generation
 
 ### Phase 3 (Weeks 9-12): Production Intelligence
 - Batch planning and yield tracking
@@ -212,11 +276,12 @@ Design principle:
 - Full P&L automation
 - KPI targets and alerts
 - Scenario simulator
+- Monthly survival dashboard with runway tracking
 - Management scorecard
 
 ---
 
-## 9) Suggested Technology Architecture
+## 10) Suggested Technology Architecture
 - **Frontend:** Web app (manager dashboard) + tablet POS UI.
 - **Backend:** API service + background jobs for KPI snapshots.
 - **Database:** PostgreSQL with strict audit fields (`created_at`, `created_by`, etc.).
@@ -226,7 +291,7 @@ Design principle:
 
 ---
 
-## 10) Nigerian Operating Realities to Encode
+## 11) Nigerian Operating Realities to Encode
 - Multiple payment rails and unstable connectivity.
 - Power cost volatility (diesel, gas, PHED).
 - Inflation and supplier price swings requiring frequent menu/recipe repricing.
@@ -235,21 +300,23 @@ Design principle:
 
 ---
 
-## 11) Initial Build Checklist (MVP)
+## 12) Initial Build Checklist (MVP)
 - [ ] Setup branches, environments, and deployment pipeline.
 - [ ] Define data dictionary for all master/transaction tables.
 - [ ] Build POS order + payment + receipt flow.
 - [ ] Build inventory movement ledger.
 - [ ] Add daily close workflow with manager sign-off.
 - [ ] Launch KPI dashboard v1 (revenue, COGS%, OPEX%, cash).
+- [ ] Add weekly and monthly status pages matching your existing business sheets.
 - [ ] Pilot for 2 weeks and compare software metrics to manual books.
 
 ---
 
-## 12) Success Criteria (First 90 days)
+## 13) Success Criteria (First 90 days)
 - 95%+ sales captured digitally with shift reconciliation.
 - COGS stabilized at or below 50% (or a clear reduction trend).
 - Waste reduced by at least 20% from baseline.
 - Fixed OPEX visibility with <=5% unexplained variance.
 - Weekly management meetings run directly from system reports.
+- Daily owner sign-off completion >=95%.
 
