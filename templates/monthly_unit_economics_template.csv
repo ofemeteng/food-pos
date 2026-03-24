@@ -1,0 +1,11 @@
+metric,formula,example_value_ngn,notes
+monthly_revenue,daily_revenue*operating_days,6720000,Using 28-day month
+cogs,revenue*cogs_percent,3360000,Target <= 50%
+gross_profit,revenue-cogs,3360000,
+fixed_opex,sum(all_fixed_operating_costs),1840000,
+lender_payment,revenue*0.10,672000,Adjust if repayment terms change
+operating_surplus,gross_profit-fixed_opex-lender_payment,848000,Positive means operating cushion
+survival_floor_monthly,configured_target,4800000,Business survival threshold
+conservative_target_monthly,configured_target,7000000,Operating target
+monthly_status,if(revenue<survival_floor,"CRITICAL",if(revenue<target,"SURVIVAL","ON_TARGET")),SURVIVAL,Use for monthly survival dashboard
+break_even_revenue,(fixed_opex+lender_payment)/(1-cogs_percent),5028571,Assuming cogs_percent=0.5 and lender=10%
